@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desktop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Startup Screen -->
+  <div id="startup">
+    <div class="mug-container">
+      <div class="iso-scene">
+        <div class="iso-world">
+          <!-- Plate / Saucer -->
+          <div class="plate">
+            <span class="plate-text">JOE 004</span>
+          </div>
+          <!-- Mug -->
+          <div class="mug-box">
+            <div class="mug-wall-s"></div>
+            <div class="mug-wall-e"></div>
+            <div class="mug-top-face">
+              <div class="latte-art"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="start-text">press enter to start</div>
+  </div>
+
+  <!-- Desktop -->
+  <div id="desktop">
+
+    <!-- Desktop Icons -->
+    <div id="desktop-icons">
+      <div class="desktop-icon" id="ie-desktop-icon">
+        <div class="ie-icon">
+          <div class="ie-icon-ring"></div>
+          <div class="ie-icon-letter">e</div>
+        </div>
+        <span class="desktop-icon-label">Internet<br>Explorer</span>
+      </div>
+    </div>
+
+    <!-- File Explorer Window (open by default) -->
+    <div id="file-explorer" class="window resizable">
+      <div class="title-bar" data-window="file-explorer">
+        <span class="title-bar-text">File Explorer</span>
+        <div class="title-bar-controls">
+          <button class="title-btn minimize-btn" data-tooltip="Minimize">_</button>
+          <button class="title-btn maximize-btn" data-tooltip="Maximize">&#9633;</button>
+          <button class="title-btn close-btn" data-tooltip="Close">&times;</button>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button id="back-btn" class="toolbar-btn" disabled>&larr; Back</button>
+        <span id="address-bar">C:\</span>
+      </div>
+      <div class="menu-bar">
+        <span>File</span>
+        <span>Edit</span>
+        <span>View</span>
+        <span>Help</span>
+      </div>
+      <div class="window-content" id="explorer-content"></div>
+      <div class="status-bar" id="explorer-status">2 object(s)</div>
+      <div class="resize-handle"></div>
+    </div>
+
+    <!-- Text File Viewer Window (hidden) -->
+    <div id="text-viewer" class="window hidden resizable">
+      <div class="title-bar" data-window="text-viewer">
+        <span class="title-bar-text" id="viewer-title">Notepad</span>
+        <div class="title-bar-controls">
+          <button class="title-btn minimize-btn" data-tooltip="Minimize">_</button>
+          <button class="title-btn maximize-btn" data-tooltip="Maximize">&#9633;</button>
+          <button class="title-btn close-btn" data-tooltip="Close">&times;</button>
+        </div>
+      </div>
+      <div class="menu-bar">
+        <span>File</span>
+        <span>Edit</span>
+        <span>Format</span>
+        <span>Help</span>
+      </div>
+      <div class="window-content text-viewer-content" id="viewer-content"></div>
+      <div class="resize-handle"></div>
+    </div>
+
+    <!-- Internet Explorer Window (hidden) -->
+    <div id="ie-window" class="window hidden resizable">
+      <div class="title-bar" data-window="ie-window">
+        <span class="title-bar-text" id="ie-title">Wiby - Internet Explorer</span>
+        <div class="title-bar-controls">
+          <button class="title-btn minimize-btn" data-tooltip="Minimize">_</button>
+          <button class="title-btn maximize-btn" data-tooltip="Maximize">&#9633;</button>
+          <button class="title-btn close-btn" data-tooltip="Close">&times;</button>
+        </div>
+      </div>
+      <div class="menu-bar">
+        <span>File</span>
+        <span>Edit</span>
+        <span>View</span>
+        <span>Favorites</span>
+        <span>Tools</span>
+        <span>Help</span>
+      </div>
+      <div class="ie-toolbar">
+        <button id="ie-back" class="toolbar-btn" disabled>&larr;</button>
+        <button id="ie-forward" class="toolbar-btn" disabled>&rarr;</button>
+        <button id="ie-refresh" class="toolbar-btn">&#8635;</button>
+        <button id="ie-home" class="toolbar-btn">&#8962;</button>
+        <div class="ie-address-wrapper">
+          <span class="ie-address-label">Address</span>
+          <input type="text" id="ie-address" class="ie-address-input" value="https://wiby.me/" spellcheck="false">
+        </div>
+        <button id="ie-go" class="toolbar-btn">Go</button>
+      </div>
+      <div class="ie-content-wrapper">
+        <iframe id="ie-frame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+      </div>
+      <div class="status-bar" id="ie-status">Done</div>
+      <div class="resize-handle"></div>
+    </div>
+
+    <!-- Taskbar -->
+    <div id="taskbar">
+      <button id="start-button">
+        <span class="start-icon">&#8862;</span> Start
+      </button>
+      <div class="taskbar-divider"></div>
+      <button id="explorer-button" title="File Explorer">
+        <div class="taskbar-folder-icon">
+          <div class="tf-tab"></div>
+          <div class="tf-body"></div>
+        </div>
+      </button>
+      <button id="ie-taskbar-button" title="Internet Explorer">
+        <div class="taskbar-ie-icon">
+          <div class="taskbar-ie-ring"></div>
+          <div class="taskbar-ie-letter">e</div>
+        </div>
+      </button>
+      <div class="taskbar-spacer"></div>
+      <div id="taskbar-clock"></div>
+    </div>
+  </div>
+
+  <!-- Tooltip element (shared, moved by JS) -->
+  <div id="tooltip" class="tooltip"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
