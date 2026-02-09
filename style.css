@@ -669,6 +669,7 @@ html, body {
   pointer-events: none;
   display: none;
   white-space: nowrap;
+  transform: translateX(-50%);
 }
 
 .tooltip.visible {

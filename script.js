@@ -235,27 +235,6 @@ function createNotepadWindow(name, content) {
     bringToFront(win);
   });
 
-  // Tooltips on title-bar buttons
-  win.querySelectorAll('.title-btn[data-tooltip]').forEach(btn => {
-    btn.addEventListener('mouseenter', () => {
-      const text = btn.dataset.tooltip;
-      tooltipTimeout = setTimeout(() => {
-        tooltipEl.textContent = text;
-        tooltipEl.classList.add('visible');
-        const rect = btn.getBoundingClientRect();
-        tooltipEl.style.left = (rect.left / zoom) + 'px';
-        tooltipEl.style.top = ((rect.bottom + 4) / zoom) + 'px';
-      }, 400);
-    });
-    btn.addEventListener('mouseleave', () => {
-      clearTimeout(tooltipTimeout);
-      tooltipEl.classList.remove('visible');
-    });
-    btn.addEventListener('mousedown', () => {
-      clearTimeout(tooltipTimeout);
-      tooltipEl.classList.remove('visible');
-    });
-  });
 
   desktop.appendChild(win);
   notepadWindows.push(win);
@@ -388,27 +367,6 @@ function createTerminalWindow() {
     bringToFront(win);
   });
 
-  // Tooltips on title-bar buttons
-  win.querySelectorAll('.title-btn[data-tooltip]').forEach(btn => {
-    btn.addEventListener('mouseenter', () => {
-      const text = btn.dataset.tooltip;
-      tooltipTimeout = setTimeout(() => {
-        tooltipEl.textContent = text;
-        tooltipEl.classList.add('visible');
-        const rect = btn.getBoundingClientRect();
-        tooltipEl.style.left = (rect.left / zoom) + 'px';
-        tooltipEl.style.top = ((rect.bottom + 4) / zoom) + 'px';
-      }, 400);
-    });
-    btn.addEventListener('mouseleave', () => {
-      clearTimeout(tooltipTimeout);
-      tooltipEl.classList.remove('visible');
-    });
-    btn.addEventListener('mousedown', () => {
-      clearTimeout(tooltipTimeout);
-      tooltipEl.classList.remove('visible');
-    });
-  });
 
   desktop.appendChild(win);
   terminalWindows.push(win);
@@ -559,28 +517,6 @@ document.querySelectorAll('.resize-handle').forEach(handle => {
 const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
 let tooltipTimeout = null;
 
-document.querySelectorAll('.title-btn[data-tooltip]').forEach(btn => {
-  btn.addEventListener('mouseenter', (e) => {
-    const text = btn.dataset.tooltip;
-    tooltipTimeout = setTimeout(() => {
-      tooltipEl.textContent = text;
-      tooltipEl.classList.add('visible');
-      const rect = btn.getBoundingClientRect();
-      tooltipEl.style.left = (rect.left / zoom) + 'px';
-      tooltipEl.style.top = ((rect.bottom + 4) / zoom) + 'px';
-    }, 400);
-  });
-
-  btn.addEventListener('mouseleave', () => {
-    clearTimeout(tooltipTimeout);
-    tooltipEl.classList.remove('visible');
-  });
-
-  btn.addEventListener('mousedown', () => {
-    clearTimeout(tooltipTimeout);
-    tooltipEl.classList.remove('visible');
-  });
-});
 
 // === Taskbar Tooltips ===
 document.querySelectorAll('#taskbar button[data-tooltip]').forEach(btn => {
@@ -590,8 +526,8 @@ document.querySelectorAll('#taskbar button[data-tooltip]').forEach(btn => {
       tooltipEl.textContent = text;
       tooltipEl.classList.add('visible');
       const rect = btn.getBoundingClientRect();
-      tooltipEl.style.left = (rect.left / zoom) + 'px';
-      tooltipEl.style.top = ((rect.top - tooltipEl.offsetHeight - 4) / zoom) + 'px';
+      tooltipEl.style.left = (rect.left + rect.width / 2) + 'px';
+      tooltipEl.style.top = (rect.top - tooltipEl.offsetHeight - 4) + 'px';
     }, 400);
   });
 
