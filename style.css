@@ -11,6 +11,7 @@ html, body {
   overflow: hidden;
   font-family: "Press Start 2P", monospace;
   cursor: default;
+  zoom: 1.15;
 }
 
 /* ===== Startup Screen ===== */
