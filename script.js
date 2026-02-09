@@ -40,10 +40,11 @@ const explorerContent = document.getElementById('explorer-content');
 const explorerStatus = document.getElementById('explorer-status');
 const backBtn = document.getElementById('back-btn');
 const addressBar = document.getElementById('address-bar');
-const textViewer = document.getElementById('text-viewer');
-const viewerTitle = document.getElementById('viewer-title');
-const viewerContent = document.getElementById('viewer-content');
 const tooltipEl = document.getElementById('tooltip');
+
+// Notepad window tracking
+let notepadWindows = [];
+let notepadOffset = 0;
 
 // IE refs
 const ieWindow = document.getElementById('ie-window');
@@ -145,11 +146,99 @@ function renderFolder(path) {
 function openFile(name, path) {
   const node = getNode(path);
   if (!node || node.type !== 'file') return;
+  createNotepadWindow(name, node.content);
+}
 
-  viewerTitle.textContent = name + ' - Notepad';
-  viewerContent.textContent = node.content;
-  textViewer.classList.remove('hidden');
-  bringToFront(textViewer);
+function createNotepadWindow(name, content) {
+  const win = document.createElement('div');
+  win.className = 'window notepad-window resizable';
+
+  const offsetVal = notepadOffset % 5;
+  win.style.top = (100 + offsetVal * 30) + 'px';
+  win.style.left = (200 + offsetVal * 30) + 'px';
+  notepadOffset++;
+
+  win.innerHTML = `
+    <div class="title-bar">
+      <span class="title-bar-text">${name} - Notepad</span>
+      <div class="title-bar-controls">
+        <button class="title-btn minimize-btn" data-tooltip="Minimize">_</button>
+        <button class="title-btn maximize-btn" data-tooltip="Maximize">&#9633;</button>
+        <button class="title-btn close-btn" data-tooltip="Close">&times;</button>
+      </div>
+    </div>
+    <div class="menu-bar">
+      <span>File</span>
+      <span>Edit</span>
+      <span>Format</span>
+      <span>Help</span>
+    </div>
+    <div class="window-content text-viewer-content"></div>
+    <div class="resize-handle"></div>
+  `;
+
+  // Set text content safely (not innerHTML) to avoid injection
+  win.querySelector('.text-viewer-content').textContent = content;
+
+  // Close button — remove from DOM and tracking array
+  win.querySelector('.close-btn').addEventListener('click', () => {
+    win.remove();
+    notepadWindows = notepadWindows.filter(w => w !== win);
+  });
+
+  // Drag via title bar
+  const titleBar = win.querySelector('.title-bar');
+  titleBar.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.title-btn')) return;
+    dragWindow = win;
+    dragOffsetX = e.clientX - win.offsetLeft;
+    dragOffsetY = e.clientY - win.offsetTop;
+    titleBar.style.cursor = 'grabbing';
+    bringToFront(win);
+  });
+
+  // Resize handle
+  const handle = win.querySelector('.resize-handle');
+  handle.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    resizeWindow = win;
+    resizeStartX = e.clientX;
+    resizeStartY = e.clientY;
+    resizeStartW = win.offsetWidth;
+    resizeStartH = win.offsetHeight;
+    bringToFront(win);
+  });
+
+  // Focus on click
+  win.addEventListener('mousedown', () => {
+    bringToFront(win);
+  });
+
+  // Tooltips on title-bar buttons
+  win.querySelectorAll('.title-btn[data-tooltip]').forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+      const text = btn.dataset.tooltip;
+      tooltipTimeout = setTimeout(() => {
+        tooltipEl.textContent = text;
+        tooltipEl.classList.add('visible');
+        const rect = btn.getBoundingClientRect();
+        tooltipEl.style.left = rect.left + 'px';
+        tooltipEl.style.top = (rect.bottom + 4) + 'px';
+      }, 400);
+    });
+    btn.addEventListener('mouseleave', () => {
+      clearTimeout(tooltipTimeout);
+      tooltipEl.classList.remove('visible');
+    });
+    btn.addEventListener('mousedown', () => {
+      clearTimeout(tooltipTimeout);
+      tooltipEl.classList.remove('visible');
+    });
+  });
+
+  desktop.appendChild(win);
+  notepadWindows.push(win);
+  bringToFront(win);
 }
 
 // === Back Button ===
@@ -169,6 +258,22 @@ explorerButton.addEventListener('click', () => {
   } else {
     fileExplorer.classList.add('hidden');
   }
+});
+
+// === Notepad Taskbar Toggle ===
+const notepadTaskbarButton = document.getElementById('notepad-taskbar-button');
+
+notepadTaskbarButton.addEventListener('click', () => {
+  if (notepadWindows.length === 0) return;
+  const anyVisible = notepadWindows.some(w => !w.classList.contains('hidden'));
+  notepadWindows.forEach(w => {
+    if (anyVisible) {
+      w.classList.add('hidden');
+    } else {
+      w.classList.remove('hidden');
+      bringToFront(w);
+    }
+  });
 });
 
 // === Close Buttons (attach to all current and use event delegation) ===
@@ -272,6 +377,30 @@ document.querySelectorAll('.title-btn[data-tooltip]').forEach(btn => {
       const rect = btn.getBoundingClientRect();
       tooltipEl.style.left = rect.left + 'px';
       tooltipEl.style.top = (rect.bottom + 4) + 'px';
+    }, 400);
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    clearTimeout(tooltipTimeout);
+    tooltipEl.classList.remove('visible');
+  });
+
+  btn.addEventListener('mousedown', () => {
+    clearTimeout(tooltipTimeout);
+    tooltipEl.classList.remove('visible');
+  });
+});
+
+// === Taskbar Tooltips ===
+document.querySelectorAll('#taskbar button[data-tooltip]').forEach(btn => {
+  btn.addEventListener('mouseenter', () => {
+    const text = btn.dataset.tooltip;
+    tooltipTimeout = setTimeout(() => {
+      tooltipEl.textContent = text;
+      tooltipEl.classList.add('visible');
+      const rect = btn.getBoundingClientRect();
+      tooltipEl.style.left = rect.left + 'px';
+      tooltipEl.style.top = (rect.top - tooltipEl.offsetHeight - 4) + 'px';
     }, 400);
   });
 

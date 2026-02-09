@@ -73,26 +73,6 @@
       <div class="resize-handle"></div>
     </div>
 
-    <!-- Text File Viewer Window (hidden) -->
-    <div id="text-viewer" class="window hidden resizable">
-      <div class="title-bar" data-window="text-viewer">
-        <span class="title-bar-text" id="viewer-title">Notepad</span>
-        <div class="title-bar-controls">
-          <button class="title-btn minimize-btn" data-tooltip="Minimize">_</button>
-          <button class="title-btn maximize-btn" data-tooltip="Maximize">&#9633;</button>
-          <button class="title-btn close-btn" data-tooltip="Close">&times;</button>
-        </div>
-      </div>
-      <div class="menu-bar">
-        <span>File</span>
-        <span>Edit</span>
-        <span>Format</span>
-        <span>Help</span>
-      </div>
-      <div class="window-content text-viewer-content" id="viewer-content"></div>
-      <div class="resize-handle"></div>
-    </div>
-
     <!-- Internet Explorer Window (hidden) -->
     <div id="ie-window" class="window hidden resizable">
       <div class="title-bar" data-window="ie-window">
@@ -135,16 +115,23 @@
         <span class="start-icon">&#8862;</span> Start
       </button>
       <div class="taskbar-divider"></div>
-      <button id="explorer-button" title="File Explorer">
+      <button id="explorer-button" data-tooltip="File Explorer">
         <div class="taskbar-folder-icon">
           <div class="tf-tab"></div>
           <div class="tf-body"></div>
         </div>
       </button>
-      <button id="ie-taskbar-button" title="Internet Explorer">
+      <button id="ie-taskbar-button" data-tooltip="Internet Explorer">
         <div class="taskbar-ie-icon">
           <div class="taskbar-ie-ring"></div>
           <div class="taskbar-ie-letter">e</div>
+        </div>
+      </button>
+      <button id="notepad-taskbar-button" data-tooltip="Notepad">
+        <div class="taskbar-notepad-icon">
+          <div class="tn-page"></div>
+          <div class="tn-fold"></div>
+          <div class="tn-lines"></div>
         </div>
       </button>
       <div class="taskbar-spacer"></div>
