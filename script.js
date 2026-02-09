@@ -23,6 +23,14 @@ const filesystem = {
       'Links': {
         type: 'folder',
         children: {}
+      },
+      'Projects': {
+        type: 'folder',
+        children: {}
+      },
+      'Extras': {
+        type: 'folder',
+        children: {}
       }
     }
   }
