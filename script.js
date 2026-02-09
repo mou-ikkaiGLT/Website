@@ -26,7 +26,9 @@ const filesystem = {
       },
       'Projects': {
         type: 'folder',
-        children: {}
+        children: {
+          'Donut': { type: 'app', app: 'donut' }
+        }
       },
       'Extras': {
         type: 'folder',
@@ -52,6 +54,7 @@ const tooltipEl = document.getElementById('tooltip');
 
 // Notepad window tracking
 let notepadWindows = [];
+let terminalWindows = [];
 let notepadOffset = 0;
 
 // IE refs
@@ -118,6 +121,12 @@ function renderFolder(path) {
           </div>
           <span class="folder-label">${name}</span>
         </div>`;
+    } else if (entry.type === 'app') {
+      html += `
+        <div class="file-item" data-name="${name}" data-type="app">
+          <div class="file-icon"></div>
+          <span class="file-label">${name}</span>
+        </div>`;
     } else {
       html += `
         <div class="file-item" data-name="${name}" data-type="file">
@@ -153,8 +162,12 @@ function renderFolder(path) {
 
 function openFile(name, path) {
   const node = getNode(path);
-  if (!node || node.type !== 'file') return;
-  createNotepadWindow(name, node.content);
+  if (!node) return;
+  if (node.type === 'app' && node.app === 'donut') {
+    createTerminalWindow();
+  } else if (node.type === 'file') {
+    createNotepadWindow(name, node.content);
+  }
 }
 
 function createNotepadWindow(name, content) {
@@ -230,8 +243,8 @@ function createNotepadWindow(name, content) {
         tooltipEl.textContent = text;
         tooltipEl.classList.add('visible');
         const rect = btn.getBoundingClientRect();
-        tooltipEl.style.left = rect.left + 'px';
-        tooltipEl.style.top = (rect.bottom + 4) + 'px';
+        tooltipEl.style.left = (rect.left / zoom) + 'px';
+        tooltipEl.style.top = ((rect.bottom + 4) / zoom) + 'px';
       }, 400);
     });
     btn.addEventListener('mouseleave', () => {
@@ -246,6 +259,159 @@ function createNotepadWindow(name, content) {
 
   desktop.appendChild(win);
   notepadWindows.push(win);
+  bringToFront(win);
+}
+
+function createTerminalWindow() {
+  const win = document.createElement('div');
+  win.className = 'window terminal-window resizable';
+
+  const offsetVal = notepadOffset % 5;
+  win.style.top = (100 + offsetVal * 30) + 'px';
+  win.style.left = (200 + offsetVal * 30) + 'px';
+  notepadOffset++;
+
+  win.innerHTML = `
+    <div class="title-bar">
+      <span class="title-bar-text">Donut - Terminal</span>
+      <div class="title-bar-controls">
+        <button class="title-btn minimize-btn" data-tooltip="Minimize">_</button>
+        <button class="title-btn maximize-btn" data-tooltip="Maximize">&#9633;</button>
+        <button class="title-btn close-btn" data-tooltip="Close">&times;</button>
+      </div>
+    </div>
+    <pre class="terminal-content"></pre>
+    <div class="resize-handle"></div>
+  `;
+
+  const pre = win.querySelector('.terminal-content');
+
+  // Donut render math
+  const WIDTH = 80;
+  const HEIGHT = 40;
+  let A = 0, B = 0;
+
+  function render() {
+    const screen = new Array(WIDTH * HEIGHT).fill(' ');
+    const zbuf = new Array(WIDTH * HEIGHT).fill(0);
+
+    const R_outer = 32;
+    const R_inner = R_outer * 0.25;
+
+    for (let theta = 0; theta < Math.PI * 2; theta += 0.07) {
+      for (let phi = 0; phi < Math.PI * 2; phi += 0.02) {
+        let circlex = R_outer + R_inner * Math.cos(theta);
+        let circley = R_inner * Math.sin(theta);
+
+        let x =
+          circlex * (Math.cos(B) * Math.cos(phi) + Math.sin(A) * Math.sin(B) * Math.sin(phi))
+          - circley * Math.cos(A) * Math.sin(B);
+
+        let y =
+          circlex * (Math.sin(B) * Math.cos(phi) - Math.sin(A) * Math.cos(B) * Math.sin(phi))
+          + circley * Math.cos(A) * Math.cos(B);
+
+        let z =
+          Math.cos(A) * circlex * Math.sin(phi)
+          + circley * Math.sin(A) + 100;
+
+        let ooz = 1 / z;
+
+        let xp = (WIDTH / 2 + 30 * ooz * x) | 0;
+        let yp = (HEIGHT / 2 - 15 * ooz * y) | 0;
+
+        let idx = xp + WIDTH * yp;
+
+        let L =
+          Math.cos(phi) * Math.cos(theta) * Math.sin(B)
+          - Math.cos(A) * Math.cos(theta) * Math.sin(phi)
+          - Math.sin(A) * Math.sin(theta)
+          + Math.cos(B) * (Math.cos(A) * Math.sin(theta)
+          - Math.cos(theta) * Math.sin(A) * Math.sin(phi));
+
+        if (xp >= 0 && xp < WIDTH && yp >= 0 && yp < HEIGHT) {
+          if (ooz > zbuf[idx]) {
+            zbuf[idx] = ooz;
+            const lum = ".,-~:;=!*#$@";
+            let li = Math.max(0, Math.min(11, (L * 8) | 0));
+            screen[idx] = lum[li];
+          }
+        }
+      }
+    }
+
+    let output = "";
+    for (let i = 0; i < WIDTH * HEIGHT; i++) {
+      output += (i % WIDTH === 0 ? "\n" : "") + screen[i];
+    }
+
+    pre.textContent = output;
+
+    A += 0.04;
+    B += 0.02;
+  }
+
+  const intervalId = setInterval(render, 30);
+
+  // Close button — clear interval and remove from DOM
+  win.querySelector('.close-btn').addEventListener('click', () => {
+    clearInterval(intervalId);
+    win.remove();
+    terminalWindows = terminalWindows.filter(w => w !== win);
+  });
+
+  // Drag via title bar
+  const titleBar = win.querySelector('.title-bar');
+  titleBar.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.title-btn')) return;
+    dragWindow = win;
+    dragOffsetX = e.clientX - win.offsetLeft;
+    dragOffsetY = e.clientY - win.offsetTop;
+    titleBar.style.cursor = 'grabbing';
+    bringToFront(win);
+  });
+
+  // Resize handle
+  const handle = win.querySelector('.resize-handle');
+  handle.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    resizeWindow = win;
+    resizeStartX = e.clientX;
+    resizeStartY = e.clientY;
+    resizeStartW = win.offsetWidth;
+    resizeStartH = win.offsetHeight;
+    bringToFront(win);
+  });
+
+  // Focus on click
+  win.addEventListener('mousedown', () => {
+    bringToFront(win);
+  });
+
+  // Tooltips on title-bar buttons
+  win.querySelectorAll('.title-btn[data-tooltip]').forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+      const text = btn.dataset.tooltip;
+      tooltipTimeout = setTimeout(() => {
+        tooltipEl.textContent = text;
+        tooltipEl.classList.add('visible');
+        const rect = btn.getBoundingClientRect();
+        tooltipEl.style.left = (rect.left / zoom) + 'px';
+        tooltipEl.style.top = ((rect.bottom + 4) / zoom) + 'px';
+      }, 400);
+    });
+    btn.addEventListener('mouseleave', () => {
+      clearTimeout(tooltipTimeout);
+      tooltipEl.classList.remove('visible');
+    });
+    btn.addEventListener('mousedown', () => {
+      clearTimeout(tooltipTimeout);
+      tooltipEl.classList.remove('visible');
+    });
+  });
+
+  desktop.appendChild(win);
+  terminalWindows.push(win);
   bringToFront(win);
 }
 
@@ -275,6 +441,22 @@ notepadTaskbarButton.addEventListener('click', () => {
   if (notepadWindows.length === 0) return;
   const anyVisible = notepadWindows.some(w => !w.classList.contains('hidden'));
   notepadWindows.forEach(w => {
+    if (anyVisible) {
+      w.classList.add('hidden');
+    } else {
+      w.classList.remove('hidden');
+      bringToFront(w);
+    }
+  });
+});
+
+// === Terminal Taskbar Toggle ===
+const terminalTaskbarButton = document.getElementById('terminal-taskbar-button');
+
+terminalTaskbarButton.addEventListener('click', () => {
+  if (terminalWindows.length === 0) return;
+  const anyVisible = terminalWindows.some(w => !w.classList.contains('hidden'));
+  terminalWindows.forEach(w => {
     if (anyVisible) {
       w.classList.add('hidden');
     } else {
@@ -374,6 +556,7 @@ document.querySelectorAll('.resize-handle').forEach(handle => {
 });
 
 // === Tooltips ===
+const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
 let tooltipTimeout = null;
 
 document.querySelectorAll('.title-btn[data-tooltip]').forEach(btn => {
@@ -383,8 +566,8 @@ document.querySelectorAll('.title-btn[data-tooltip]').forEach(btn => {
       tooltipEl.textContent = text;
       tooltipEl.classList.add('visible');
       const rect = btn.getBoundingClientRect();
-      tooltipEl.style.left = rect.left + 'px';
-      tooltipEl.style.top = (rect.bottom + 4) + 'px';
+      tooltipEl.style.left = (rect.left / zoom) + 'px';
+      tooltipEl.style.top = ((rect.bottom + 4) / zoom) + 'px';
     }, 400);
   });
 
@@ -407,8 +590,8 @@ document.querySelectorAll('#taskbar button[data-tooltip]').forEach(btn => {
       tooltipEl.textContent = text;
       tooltipEl.classList.add('visible');
       const rect = btn.getBoundingClientRect();
-      tooltipEl.style.left = rect.left + 'px';
-      tooltipEl.style.top = (rect.top - tooltipEl.offsetHeight - 4) + 'px';
+      tooltipEl.style.left = (rect.left / zoom) + 'px';
+      tooltipEl.style.top = ((rect.top - tooltipEl.offsetHeight - 4) / zoom) + 'px';
     }, 400);
   });
 
