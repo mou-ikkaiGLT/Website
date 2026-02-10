@@ -212,8 +212,12 @@ function openFile(name, path) {
     createTerminalWindow();
   } else if (node.type === 'file' && node.src) {
     fetch(node.src)
-      .then(res => res.text())
-      .then(text => createNotepadWindow(name, text));
+      .then(res => {
+        if (!res.ok) throw new Error('Not found');
+        return res.text();
+      })
+      .then(text => createNotepadWindow(name, text))
+      .catch(() => createNotepadWindow(name, '[Error: Could not load file]'));
   } else if (node.type === 'file') {
     createNotepadWindow(name, node.content);
   }
