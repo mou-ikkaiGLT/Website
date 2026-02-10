@@ -78,20 +78,40 @@ const IE_HOME = 'https://wiby.me/';
 const mugFrames = ['Cup1.png', 'Cup2.png', 'Cup3.png', 'Cup4.png'];
 let mugFrameIndex = 0;
 const startupMug = document.getElementById('startup-mug');
-const mugInterval = setInterval(() => {
+let mugInterval = setInterval(() => {
   mugFrameIndex = (mugFrameIndex + 1) % mugFrames.length;
   startupMug.src = mugFrames[mugFrameIndex];
 }, 500);
 
+function hideStartup() {
+  clearInterval(mugInterval);
+  desktop.classList.add('active');
+  startup.classList.add('fade-out');
+  startup.addEventListener('transitionend', () => {
+    startup.style.display = 'none';
+  }, { once: true });
+}
+
+function showStartup() {
+  startup.style.display = '';
+  startup.classList.remove('fade-out');
+  mugInterval = setInterval(() => {
+    mugFrameIndex = (mugFrameIndex + 1) % mugFrames.length;
+    startupMug.src = mugFrames[mugFrameIndex];
+  }, 500);
+}
+
 // === Startup → Desktop Transition ===
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !startup.classList.contains('fade-out')) {
-    clearInterval(mugInterval);
-    desktop.classList.add('active');
-    startup.classList.add('fade-out');
-    startup.addEventListener('transitionend', () => {
-      startup.style.display = 'none';
-    }, { once: true });
+  if (e.key === 'Enter' && startup.style.display !== 'none') {
+    hideStartup();
+  }
+});
+
+// === Start Button — Show Startup Screen ===
+document.getElementById('start-button').addEventListener('click', () => {
+  if (startup.style.display === 'none') {
+    showStartup();
   }
 });
 
