@@ -6,18 +6,9 @@ const filesystem = {
       'Blog': {
         type: 'folder',
         children: {
-          'blog1.txt': {
-            type: 'file',
-            content: 'Welcome to my first blog post!\n\nThis is where I share my thoughts\non building things with code.\n\nStay tuned for more updates.'
-          },
-          'blog2.txt': {
-            type: 'file',
-            content: 'Blog Post #2\n\nToday I learned about CSS 3D\ntransforms. You can build entire\nshapes out of flat divs.\n\nPretty cool stuff.'
-          },
-          'post1.txt': {
-            type: 'file',
-            content: 'Post 1 - Hello World\n\nEvery journey starts with a\nsingle step. This is mine.\n\nThanks for reading.'
-          }
+          'blog1.txt': { type: 'file', src: 'Blogs/blog1.txt' },
+          'blog2.txt': { type: 'file', src: 'Blogs/blog2.txt' },
+          'post1.txt': { type: 'file', src: 'Blogs/post1.txt' }
         }
       },
       'Links': {
@@ -75,7 +66,7 @@ const ieTaskbarButton = document.getElementById('ie-taskbar-button');
 const IE_HOME = 'https://wiby.me/';
 
 // === Startup Mug Animation ===
-const mugFrames = ['Cup1.png', 'Cup2.png', 'Cup3.png', 'Cup4.png'];
+const mugFrames = ['Icons/Cup1.png', 'Icons/Cup2.png', 'Icons/Cup3.png', 'Icons/Cup4.png'];
 let mugFrameIndex = 0;
 const startupMug = document.getElementById('startup-mug');
 let mugInterval = setInterval(() => {
@@ -195,6 +186,10 @@ function openFile(name, path) {
   if (!node) return;
   if (node.type === 'app' && node.app === 'donut') {
     createTerminalWindow();
+  } else if (node.type === 'file' && node.src) {
+    fetch(node.src)
+      .then(res => res.text())
+      .then(text => createNotepadWindow(name, text));
   } else if (node.type === 'file') {
     createNotepadWindow(name, node.content);
   }

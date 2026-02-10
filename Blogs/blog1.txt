@@ -1,0 +1,6 @@
+Welcome to my first blog post!
+
+This is where I share my thoughts
+on building things with code.
+
+Stay tuned for more updates.
