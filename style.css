@@ -33,143 +33,19 @@ html, body {
   opacity: 0;
 }
 
-/* ===== Isometric Pixel Art Mug ===== */
+/* ===== Startup Mug Image ===== */
 .mug-container {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.iso-scene {
-  width: 360px;
-  height: 340px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.iso-world {
-  position: relative;
-  width: 230px;
-  height: 230px;
-  transform-style: preserve-3d;
-  transform: rotateX(60deg) rotateZ(-45deg);
-}
-
-/* Plate / Saucer */
-.plate {
-  position: absolute;
-  inset: 0;
-  background: #cec6b6;
-  border: 4px solid #bab2a2;
-}
-
-.plate-text {
-  position: absolute;
-  bottom: 28px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-family: "Press Start 2P", monospace;
-  font-size: 16px;
-  color: #a8a090;
-  letter-spacing: 4px;
-}
-
-/* Mug body */
-.mug-box {
-  position: absolute;
-  left: 65px;
-  top: 65px;
-  width: 100px;
-  height: 100px;
-  transform-style: preserve-3d;
-}
-
-/* South wall (left face in iso view) */
-.mug-wall-s {
-  position: absolute;
-  width: 100px;
-  height: 140px;
-  background: #e8e0d0;
-  top: 100px;
-  left: 0;
-  transform-origin: top;
-  transform: rotateX(90deg);
-  border-bottom: 4px solid #d0c8b8;
-}
-
-/* East wall (right face in iso view) */
-.mug-wall-e {
-  position: absolute;
-  width: 140px;
-  height: 100px;
-  background: #d8d0c0;
-  top: 0;
-  left: 100px;
-  transform-origin: left;
-  transform: rotateY(-90deg);
-  border-right: 4px solid #c0b8a8;
-}
-
-/* Top face — coffee surface */
-.mug-top-face {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  transform: translateZ(140px);
-  border: 10px solid #ddd6c6;
-  background: #5c3d2e;
-  overflow: hidden;
-}
-
-/* Latte art rosetta (pixel art via box-shadow) */
-.latte-art {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  background: #c8b898;
-  top: 4px;
-  left: 35px;
-  box-shadow:
-    /* Spiral / oval */
-    5px 0 0 #c8b898,
-    10px 0 0 #c8b898,
-    -5px 5px 0 #c8b898,
-    15px 5px 0 #c8b898,
-    -5px 10px 0 #c8b898,
-    15px 10px 0 #c8b898,
-    0 15px 0 #c8b898,
-    5px 15px 0 #c8b898,
-    10px 15px 0 #c8b898,
-    /* Stem */
-    5px 20px 0 #c8b898,
-    5px 25px 0 #c8b898,
-    5px 30px 0 #c8b898,
-    5px 35px 0 #c8b898,
-    5px 40px 0 #c8b898,
-    5px 45px 0 #c8b898,
-    5px 50px 0 #c8b898,
-    5px 55px 0 #c8b898,
-    5px 60px 0 #c8b898,
-    /* Left leaves */
-    0 23px 0 #c8b898,
-    -5px 28px 0 #c8b898,
-    -10px 33px 0 #c8b898,
-    0 35px 0 #c8b898,
-    -5px 40px 0 #c8b898,
-    -10px 45px 0 #c8b898,
-    0 47px 0 #c8b898,
-    -5px 52px 0 #c8b898,
-    /* Right leaves */
-    10px 23px 0 #c8b898,
-    15px 28px 0 #c8b898,
-    20px 33px 0 #c8b898,
-    10px 35px 0 #c8b898,
-    15px 40px 0 #c8b898,
-    20px 45px 0 #c8b898,
-    10px 47px 0 #c8b898,
-    15px 52px 0 #c8b898;
+.startup-mug {
+  width: 300px;
+  height: 263px;
+  object-fit: contain;
+  object-position: center bottom;
+  image-rendering: pixelated;
 }
 
 /* ===== Start Text ===== */

@@ -74,13 +74,23 @@ const ieTaskbarButton = document.getElementById('ie-taskbar-button');
 
 const IE_HOME = 'https://wiby.me/';
 
+// === Startup Mug Animation ===
+const mugFrames = ['Cup1.png', 'Cup2.png', 'Cup3.png', 'Cup4.png'];
+let mugFrameIndex = 0;
+const startupMug = document.getElementById('startup-mug');
+const mugInterval = setInterval(() => {
+  mugFrameIndex = (mugFrameIndex + 1) % mugFrames.length;
+  startupMug.src = mugFrames[mugFrameIndex];
+}, 500);
+
 // === Startup → Desktop Transition ===
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !startup.classList.contains('fade-out')) {
+    clearInterval(mugInterval);
+    desktop.classList.add('active');
     startup.classList.add('fade-out');
     startup.addEventListener('transitionend', () => {
       startup.style.display = 'none';
-      desktop.classList.add('active');
     }, { once: true });
   }
 });
