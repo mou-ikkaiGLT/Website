@@ -18,7 +18,7 @@ const filesystem = {
       'Projects': {
         type: 'folder',
         children: {
-          'Donut': { type: 'app', app: 'donut' }
+          'Donut.html': { type: 'app', app: 'donut' }
         }
       },
       'Extras': {

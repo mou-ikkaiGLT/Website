@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ASCII Spinning Torus</title>
+
+<style>
+body {
+    background: black;
+    color: white;
+    font-family: monospace;
+    white-space: pre;
+}
+</style>
+</head>
+<body>
+
+Size:
+<input type="number" id="sizeInput" value="32" min="8" max="120">
+
+<pre id="screen"></pre>
+
+<script>
+
+const WIDTH = 80;
+const HEIGHT = 40;
+let A = 0, B = 0;
+
+function render() {
+
+    const screen = new Array(WIDTH*HEIGHT).fill(' ');
+    const zbuf = new Array(WIDTH*HEIGHT).fill(0);
+
+    const size = parseFloat(document.getElementById("sizeInput").value) || 32;
+    const R_outer = size;
+    const R_inner = R_outer * 0.25;
+
+    for (let theta=0; theta<Math.PI*2; theta+=0.07) {
+        for (let phi=0; phi<Math.PI*2; phi+=0.02) {
+
+            let circlex = R_outer + R_inner*Math.cos(theta);
+            let circley = R_inner*Math.sin(theta);
+
+            let x =
+                circlex*(Math.cos(B)*Math.cos(phi)+Math.sin(A)*Math.sin(B)*Math.sin(phi))
+                - circley*Math.cos(A)*Math.sin(B);
+
+            let y =
+                circlex*(Math.sin(B)*Math.cos(phi)-Math.sin(A)*Math.cos(B)*Math.sin(phi))
+                + circley*Math.cos(A)*Math.cos(B);
+
+            let z =
+                Math.cos(A)*circlex*Math.sin(phi)
+                + circley*Math.sin(A)+100;
+
+            let ooz = 1/z;
+
+            let xp = (WIDTH/2 + 30*ooz*x)|0;
+            let yp = (HEIGHT/2 - 15*ooz*y)|0;
+
+            let idx = xp + WIDTH*yp;
+
+            let L =
+                Math.cos(phi)*Math.cos(theta)*Math.sin(B)
+                - Math.cos(A)*Math.cos(theta)*Math.sin(phi)
+                - Math.sin(A)*Math.sin(theta)
+                + Math.cos(B)*(Math.cos(A)*Math.sin(theta)
+                - Math.cos(theta)*Math.sin(A)*Math.sin(phi));
+
+            if (xp>=0 && xp<WIDTH && yp>=0 && yp<HEIGHT) {
+                if (ooz > zbuf[idx]) {
+
+                    zbuf[idx] = ooz;
+
+                    const lum=".,-~:;=!*#$@";
+                    let li = Math.max(0, Math.min(11,(L*8)|0));
+
+                    screen[idx]=lum[li];
+                }
+            }
+        }
+    }
+
+    let output="";
+    for (let i=0;i<WIDTH*HEIGHT;i++) {
+        output += (i%WIDTH===0?"\n":"") + screen[i];
+    }
+
+    document.getElementById("screen").textContent=output;
+
+    A+=0.04;
+    B+=0.02;
+}
+
+setInterval(render,30);
+
+</script>
+</body>
+</html>
