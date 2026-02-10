@@ -85,7 +85,13 @@ function hideStartup() {
 
 function showStartup() {
   startup.style.display = '';
-  startup.classList.remove('fade-out');
+  // Ensure fade-out (opacity:0) is applied before the browser paints
+  startup.classList.add('fade-out');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      startup.classList.remove('fade-out');
+    });
+  });
   mugInterval = setInterval(() => {
     mugFrameIndex = (mugFrameIndex + 1) % mugFrames.length;
     startupMug.src = mugFrames[mugFrameIndex];
@@ -99,10 +105,28 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// === Start Button — Show Startup Screen ===
-document.getElementById('start-button').addEventListener('click', () => {
-  if (startup.style.display === 'none') {
-    showStartup();
+// === Start Button — Show Dialog ===
+const startDialog = document.getElementById('start-dialog');
+const startButton = document.getElementById('start-button');
+
+startButton.addEventListener('click', () => {
+  startDialog.classList.toggle('hidden');
+});
+
+document.getElementById('refill-btn').addEventListener('click', () => {
+  startDialog.classList.add('hidden');
+  showStartup();
+});
+
+document.getElementById('finished-btn').addEventListener('click', () => {
+  window.location.reload();
+});
+
+document.addEventListener('click', (e) => {
+  if (!startDialog.classList.contains('hidden') &&
+      !startDialog.contains(e.target) &&
+      !startButton.contains(e.target)) {
+    startDialog.classList.add('hidden');
   }
 });
 
@@ -451,7 +475,9 @@ terminalTaskbarButton.addEventListener('click', () => {
 
 // === Close Buttons (attach to all current and use event delegation) ===
 document.querySelectorAll('.window').forEach(win => {
-  win.querySelector('.close-btn').addEventListener('click', () => {
+  const closeBtn = win.querySelector('.close-btn');
+  if (!closeBtn) return;
+  closeBtn.addEventListener('click', () => {
     win.classList.add('hidden');
     // Stop IE from loading when closed
     if (win.id === 'ie-window') {
