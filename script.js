@@ -223,7 +223,7 @@ function openFile(name, path) {
   }
 }
 
-function createNotepadWindow(name, content) {
+function createNotepadWindow(name, content, editable) {
   const win = document.createElement('div');
   win.className = 'window notepad-window resizable';
 
@@ -231,6 +231,10 @@ function createNotepadWindow(name, content) {
   win.style.top = (100 + offsetVal * 30) + 'px';
   win.style.left = (200 + offsetVal * 30) + 'px';
   notepadOffset++;
+
+  const contentEl = editable
+    ? '<textarea class="notepad-textarea"></textarea>'
+    : '<div class="window-content text-viewer-content"></div>';
 
   win.innerHTML = `
     <div class="title-bar">
@@ -247,12 +251,20 @@ function createNotepadWindow(name, content) {
       <span>Format</span>
       <span>Help</span>
     </div>
-    <div class="window-content text-viewer-content"></div>
+    ${contentEl}
     <div class="resize-handle"></div>
   `;
 
-  // Set text content safely (not innerHTML) to avoid injection
-  win.querySelector('.text-viewer-content').textContent = content;
+  if (editable) {
+    const textarea = win.querySelector('.notepad-textarea');
+    textarea.value = content || '';
+    textarea.addEventListener('input', () => {
+      const hasDecaf = textarea.value.toLowerCase().includes('decaf');
+      document.documentElement.classList.toggle('decaf', hasDecaf);
+    });
+  } else {
+    win.querySelector('.text-viewer-content').textContent = content;
+  }
 
   // Close button — remove from DOM and tracking array
   win.querySelector('.close-btn').addEventListener('click', () => {
@@ -449,7 +461,10 @@ explorerButton.addEventListener('click', () => {
 const notepadTaskbarButton = document.getElementById('notepad-taskbar-button');
 
 notepadTaskbarButton.addEventListener('click', () => {
-  if (notepadWindows.length === 0) return;
+  if (notepadWindows.length === 0) {
+    createNotepadWindow('Untitled', '', true);
+    return;
+  }
   const anyVisible = notepadWindows.some(w => !w.classList.contains('hidden'));
   notepadWindows.forEach(w => {
     if (anyVisible) {

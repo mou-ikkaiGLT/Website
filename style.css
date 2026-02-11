@@ -1,3 +1,8 @@
+/* ===== Decaf Easter Egg ===== */
+html.decaf {
+  filter: grayscale(100%);
+}
+
 /* ===== Reset & Global ===== */
 *, *::before, *::after {
   margin: 0;
@@ -639,6 +644,24 @@ html, body {
   white-space: pre-wrap;
   color: #000;
   min-height: 180px;
+}
+
+.notepad-textarea {
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  line-height: 1.8;
+  color: #000;
+  background: #FFE0BF;
+  margin: 4px;
+  padding: 20px;
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  flex: 1;
+  resize: none;
+  outline: none;
+  min-height: 0;
 }
 
 /* ===== Resize Handle ===== */
